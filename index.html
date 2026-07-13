@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ルリアンマルシェ ガラガラ大抽選会 Pro</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Inter & M PLUS 1p for round friendly look) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=M+PLUS+1p:wght@500;800;900&family=Cherry+Bomb+One&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'M PLUS 1p', 'Inter', sans-serif;
+            background: linear-gradient(135deg, #a5f3fc 0%, #38bdf8 100%); /* ポスターのような爽やかなスカイブルー */
+            overflow-x: hidden;
+        }
+
+        /* ポップで可愛い文字フチ装飾 */
+        .pop-title {
+            font-family: 'Cherry Bomb One', 'M PLUS 1p', sans-serif;
+            color: #ffffff;
+            text-shadow: 
+                3px 3px 0px #ff6b8b, 
+                -3px -3px 0px #ff6b8b, 
+                3px -3px 0px #ff6b8b, 
+                -3px 3px 0px #ff6b8b,
+                0px 5px 10px rgba(255, 107, 139, 0.5);
+        }
+
+        /* ガーランド（三角旗）用のクリップパス */
+        .clip-flag {
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+        }
+
+        /* レース風の装飾ドット枠 */
+        .lace-border {
+            background-image: radial-gradient(circle, #ffffff 70%, transparent 72%);
+            background-size: 16px 16px;
+        }
+
+        /* ガラガラの回転アニメーション */
+        @keyframes garagara-spin {
+            0% { transform: rotate(0deg); }
+            10% { transform: rotate(-15deg); }
+            100% { transform: rotate(1440deg); }
+        }
+        .animate-spin-garagara {
+            animation: garagara-spin 3s cubic-bezier(0.45, 0.05, 0.15, 0.95) forwards;
+        }
+
+        /* ハンドルの回転アニメーション */
+        @keyframes handle-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-2880deg); }
+        }
+        .animate-spin-handle {
+            animation: handle-spin 3s cubic-bezier(0.45, 0.05, 0.15, 0.95) forwards;
+        }
+
+        /* 当選ボード（全画面モーダル）の出現アニメーション */
+        @keyframes board-reveal {
+            0% {
+                transform: scale(0.3) rotate(-10deg);
+                opacity: 0;
+            }
+            70% {
+                transform: scale(1.08) rotate(3deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+        .animate-board-reveal {
+            animation: board-reveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* 太陽のような背景回転 */
+        @keyframes sunburst-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-sunburst {
+            animation: sunburst-spin 25s linear infinite;
+        }
+
+        /* ぷるぷる揺れるアニメーション（ボタン用） */
+        @keyframes jelly {
+            0%, 100% { transform: scale(1, 1); }
+            25% { transform: scale(0.9, 1.1); }
+            50% { transform: scale(1.1, 0.9); }
+            75% { transform: scale(0.95, 1.05); }
+        }
+        .animate-jelly:hover {
+            animation: jelly 0.6s ease-in-out;
+        }
+
+        /* カスタムスクロールバー（パステルピンク調） */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ffb7c5;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff8da1;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-700 flex flex-col justify-between p-4 md:p-6 relative">
+
+    <!-- 背景のふんわりとした白い雲のような装飾 -->
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-white/30 via-transparent to-transparent pointer-events-none"></div>
+
+    <!-- 上部のカラフルなガーランドフラッグ（マルシェのワクワク感を演出） -->
+    <div class="absolute top-0 left-0 right-0 h-6 flex justify-between overflow-hidden pointer-events-none z-20">
+        <div class="flex-grow flex justify-around">
+            <div class="w-8 h-10 bg-[#ff8da1] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#fff176] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#a5f3fc] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#bbf7d0] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#ffb7c5] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#fed7aa] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#ff8da1] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#fff176] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#a5f3fc] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#bbf7d0] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#ffb7c5] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#fed7aa] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#ff8da1] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#fff176] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#a5f3fc] clip-flag shadow-sm"></div>
+            <div class="w-8 h-10 bg-[#bbf7d0] clip-flag shadow-sm"></div>
+        </div>
+    </div>
+
+    <!-- メインコンテナ -->
+    <div class="max-w-7xl mx-auto w-full flex-grow flex flex-col z-10 mt-4">
+        
+        <!-- ヘッダー -->
+        <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 border-b-2 border-white/40 pb-4">
+            <div class="text-center md:text-left">
+                <h1 class="text-3xl md:text-5xl font-black tracking-wider pop-title flex items-center justify-center md:justify-start gap-3">
+                    🎪 ルリアンマルシェ 🎪
+                </h1>
+                <p class="text-sm text-slate-800 font-bold mt-1 bg-white/60 px-3 py-1 rounded-full inline-block shadow-sm">
+                    🎈 わくわくガラガラ大抽選会 🎈
+                </p>
+            </div>
+            
+            <!-- コントロール簡易スイッチ -->
+            <div class="flex items-center gap-3 bg-white/80 p-2 rounded-2xl shadow-md border border-white/50">
+                <button id="muteBtn" onclick="toggleMute()" class="w-10 h-10 rounded-xl bg-[#ffb7c5] hover:bg-[#ff8da1] transition flex items-center justify-center text-white shadow-sm" title="音量切替">
+                    <i id="muteIcon" class="fa-solid fa-volume-high"></i>
+                </button>
+                <button id="fullscreenBtn" onclick="toggleFullscreen()" class="w-10 h-10 rounded-xl bg-[#a5f3fc] hover:bg-[#7dd3fc] transition flex items-center justify-center text-slate-700 shadow-sm" title="全画面表示">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+                <button onclick="openSettingsModal()" class="px-4 h-10 rounded-xl bg-[#fff176] hover:bg-[#fde047] text-slate-800 font-black transition flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-gear text-amber-500"></i> 設定
+                </button>
+            </div>
+        </header>
+
+        <!-- メイングリッドエリア -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-grow items-stretch">
+            
+            <!-- 左サイド：現在の景品情報 & 進行状況 -->
+            <div class="lg:col-span-1 bg-white/70 border border-white/60 rounded-3xl p-5 flex flex-col justify-between shadow-lg backdrop-blur-md">
+                <div>
+                    <h2 class="text-lg font-black pb-2 mb-4 text-[#ff6b8b] border-b-2 border-[#ffb7c5]/30 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info"></i> 現在の状況
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-sky-50/60 p-3 rounded-2xl border border-sky-100">
+                            <span class="text-xs text-sky-500 font-bold block">抽選対象の範囲</span>
+                            <span id="statusRange" class="text-lg font-bold text-slate-800">設定中...</span>
+                        </div>
+                        <div class="bg-pink-50/60 p-3 rounded-2xl border border-pink-100">
+                            <span class="text-xs text-pink-500 font-bold block">残り抽選可能数</span>
+                            <span id="statusRemaining" class="text-2xl font-black text-[#ff6b8b]">0</span>
+                            <span class="text-xs text-slate-500">/ <span id="statusTotal">0</span></span>
+                        </div>
+                        <div class="bg-amber-50/60 p-3 rounded-2xl border border-amber-100">
+                            <span class="text-xs text-amber-600 font-bold block">重複当選</span>
+                            <span id="statusNoRepeat" class="text-xs font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 inline-block mt-1">なし (重複防止)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 景品カード（設定されている場合表示） -->
+                <div id="prizeDisplayCard" class="mt-6 bg-gradient-to-br from-pink-100 to-amber-50 border border-pink-200 p-4 rounded-2xl shadow-sm hidden">
+                    <span class="text-xs text-[#ff6b8b] font-bold block uppercase tracking-wider mb-1"><i class="fa-solid fa-trophy text-amber-500"></i> 次の当選景品</span>
+                    <h3 id="currentPrizeName" class="text-xl font-black text-slate-800 truncate">--</h3>
+                </div>
+
+                <!-- クイック初期化ボタン -->
+                <button onclick="resetLotteryConfirm()" class="mt-6 text-xs text-slate-400 hover:text-red-500 transition text-left flex items-center gap-1 font-bold">
+                    <i class="fa-solid fa-triangle-exclamation"></i> 抽選履歴をリセットする
+                </button>
+            </div>
+
+            <!-- 中央：ガラガラ本体と演出スクリーン -->
+            <div class="lg:col-span-2 flex flex-col justify-between items-center bg-white/50 border border-white/60 rounded-3xl p-6 relative overflow-hidden min-h-[480px] shadow-lg backdrop-blur-md">
+                
+                <!-- 演出用バナーメッセージ -->
+                <div class="text-center z-10 w-full">
+                    <p id="displayBanner" class="text-lg md:text-2xl font-black tracking-widest text-[#ff6b8b] animate-pulse h-8">
+                        スタートボタンを押してくじを回そう！
+                    </p>
+                </div>
+
+                <!-- ガラガラ抽選器 ＆ 玉表示エリア -->
+                <div class="relative w-full flex-grow flex items-center justify-center my-6">
+                    
+                    <!-- ガラガラ本体 (SVG) -->
+                    <div id="garagaraWrapper" class="relative w-72 h-72 transition-all duration-500 flex items-center justify-center">
+                        <!-- ガラガラドラム (回る部分 - パステルピンク＆ホワイトのテント風) -->
+                        <svg id="drumSvg" class="absolute w-56 h-56 z-10 drop-shadow-md" viewBox="0 0 200 200">
+                            <!-- サーカステント調のセグメント背景 (八角形のドラム外周) -->
+                            <polygon points="100,20 156,43 180,100 156,157 100,180 43,157 20,100 43,43" fill="#ffb7c5" stroke="#ffffff" stroke-width="6" />
+                            <!-- 内側のパステルサーカスストライプ装飾 -->
+                            <polygon points="100,30 148,50 170,100 148,150 100,170 52,150 30,100 52,50" fill="#fff176" stroke="#ffffff" stroke-width="2" />
+                            <!-- 中心に近いインナー円 -->
+                            <circle cx="100" cy="100" r="30" fill="#a5f3fc" stroke="#ffffff" stroke-width="4" />
+                            <circle cx="100" cy="100" r="15" fill="#ff8da1" />
+                            <!-- 排出口の金属板（ミントグリーン調） -->
+                            <rect x="90" y="20" width="20" height="15" fill="#bbf7d0" rx="4" stroke="#ffffff" stroke-width="2" />
+                            <circle cx="100" cy="27" r="4" fill="#ff6b8b" />
+                        </svg>
+
+                        <!-- ハンドル (逆方向に回る - キャンディピンク) -->
+                        <svg id="handleSvg" class="absolute w-60 h-60 z-20 pointer-events-none" viewBox="0 0 200 200">
+                            <!-- 中心からのアーム -->
+                            <line x1="100" y1="100" x2="160" y2="70" stroke="#ffffff" stroke-width="8" stroke-linecap="round" />
+                            <line x1="100" y1="100" x2="160" y2="70" stroke="#ff8da1" stroke-width="4" stroke-linecap="round" />
+                            <!-- 持ち手 -->
+                            <circle cx="160" cy="70" r="14" fill="#ff6b8b" stroke="#ffffff" stroke-width="3" />
+                            <circle cx="160" cy="70" r="5" fill="#ffffff" />
+                        </svg>
+
+                        <!-- ガラガラの支柱（固定、ホワイトとイエローのストライプポール風） -->
+                        <svg class="absolute w-64 h-64 z-0 pointer-events-none" viewBox="0 0 200 200">
+                            <!-- A型フレームの脚 -->
+                            <line x1="60" y1="180" x2="100" y2="100" stroke="#fed7aa" stroke-width="12" stroke-linecap="round" />
+                            <line x1="140" y1="180" x2="100" y2="100" stroke="#fed7aa" stroke-width="12" stroke-linecap="round" />
+                            <line x1="60" y1="180" x2="100" y2="100" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-dasharray="8 8" />
+                            <line x1="140" y1="180" x2="100" y2="100" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-dasharray="8 8" />
+                            <!-- 金属の補強パーツ -->
+                            <line x1="75" y1="150" x2="125" y2="150" stroke="#ffb7c5" stroke-width="6" stroke-linecap="round" />
+                            <!-- 土台（木製を意識した温かみのあるオレンジベージュベース） -->
+                            <rect x="40" y="175" width="120" height="15" fill="#fdba74" rx="6" stroke="#ffffff" stroke-width="3" />
+                            <!-- 受け皿 -->
+                            <path d="M 32,175 Q 42,145 70,145 L 75,175 Z" fill="#fff176" stroke="#ffffff" stroke-width="3" />
+                        </svg>
+                    </div>
+
+                </div>
+
+                <!-- アクションボタンエリア -->
+                <div class="w-full flex flex-col items-center gap-3 z-10">
+                    <button id="drawBtn" onclick="startLottery()" class="animate-jelly w-full max-w-xs md:max-w-md py-4 md:py-5 bg-gradient-to-r from-[#ff8da1] via-[#ff6b8b] to-[#ff8da1] rounded-full text-2xl md:text-3xl font-black tracking-widest text-white border-b-8 border-rose-400 flex items-center justify-center gap-3 active:border-b-2 active:translate-y-1 transition-all select-none shadow-[0_8px_20px_rgba(255,107,139,0.4)]">
+                        <i class="fa-solid fa-circle-play"></i> くじを引く！
+                    </button>
+                    <p class="text-xs text-slate-500 font-bold">スペースキーを押してもくじを引けます 🎈</p>
+                </div>
+
+            </div>
+
+            <!-- 右サイド：当選履歴一覧 -->
+            <div class="lg:col-span-1 bg-white/70 border border-white/60 rounded-3xl p-5 flex flex-col justify-between shadow-lg backdrop-blur-md">
+                <div class="flex-grow flex flex-col overflow-hidden">
+                    <div class="flex justify-between items-center border-b-2 border-slate-100 pb-2 mb-4">
+                        <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-list-ol text-[#ff6b8b]"></i> 当選履歴 (<span id="historyCount">0</span>)
+                        </h2>
+                        <!-- 全消去ボタン -->
+                        <button onclick="clearHistoryConfirm()" class="text-xs text-slate-400 hover:text-red-500 transition" title="履歴をクリア">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+
+                    <!-- 履歴エリア -->
+                    <div class="flex-grow flex flex-col overflow-hidden relative">
+                        <!-- 履歴が空のときの表示 -->
+                        <div id="emptyHistory" class="text-center py-12 text-slate-400 text-sm">
+                            <i class="fa-solid fa-ticket text-3xl mb-2 opacity-30 block text-pink-400 animate-bounce"></i>
+                            履歴はまだありません
+                        </div>
+                        <!-- 履歴スクロールエリア -->
+                        <div id="historyList" class="space-y-2 overflow-y-auto flex-grow max-h-[350px] lg:max-h-none pr-1 hidden">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CSVダウンロードボタン -->
+                <button onclick="exportCSV()" class="mt-4 w-full py-2.5 bg-white hover:bg-pink-50 text-[#ff6b8b] border-2 border-[#ffb7c5] rounded-2xl text-sm font-black transition flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-file-csv"></i> 履歴をCSVで保存する
+                </button>
+            </div>
+
+        </div>
+
+        <!-- フッター -->
+        <footer class="mt-6 text-center text-xs text-slate-600 font-bold flex justify-between items-center border-t border-white/30 pt-4">
+            <p>© Le'Lien marché - わくわくガラガラ抽選システム</p>
+            <p class="font-mono">Lucky Day 🎉</p>
+        </footer>
+
+    </div>
+
+    <!-- 【超重要】プロジェクター・大画面投影用のパステルカラー全画面当選結果発表スクリーン（オーバーレイ） -->
+    <div id="revealOverlay" class="fixed inset-0 bg-sky-400/90 backdrop-blur-md z-50 flex flex-col items-center justify-center hidden transition-all duration-300 select-none">
+        
+        <!-- 背景のポップなパステルサンバースト（回転するストライプ） -->
+        <div class="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none opacity-40">
+            <svg class="w-[180vmax] h-[180vmax] animate-sunburst" viewBox="0 0 100 100">
+                <!-- 放射状のハッピーパステルイローストライプ -->
+                <g fill="#fff176">
+                    <polygon points="50,50 40,0 60,0" />
+                    <polygon points="50,50 80,10 90,25" />
+                    <polygon points="50,50 100,40 100,60" />
+                    <polygon points="50,50 90,75 80,90" />
+                    <polygon points="50,50 60,100 40,100" />
+                    <polygon points="50,50 20,90 10,75" />
+                    <polygon points="50,50 0,60 0,40" />
+                    <polygon points="50,50 10,25 20,10" />
+                </g>
+            </svg>
+        </div>
+
+        <!-- 紙吹雪用全画面キャンバス -->
+        <canvas id="confettiCanvas" class="absolute inset-0 pointer-events-none z-30"></canvas>
+
+        <!-- メインの当選コンテンツ構造 -->
+        <div class="z-10 flex flex-col items-center justify-center text-center px-4 w-full max-w-4xl animate-board-reveal">
+            
+            <!-- 上部お祝いアナウンスバナー -->
+            <div class="mb-4">
+                <span class="inline-block px-8 py-3 bg-gradient-to-r from-[#ff8da1] to-[#ff6b8b] text-white font-black text-xl md:text-3xl rounded-full shadow-lg border-4 border-white animate-bounce">
+                    🎉 おめでとうございます！ 🎉
+                </span>
+            </div>
+
+            <!-- 連動景品表示（極太キュートなバナー） -->
+            <div id="overlayPrizeContainer" class="mb-6 hidden w-full max-w-2xl">
+                <div class="bg-white/90 border-4 border-[#ffb7c5] p-4 rounded-3xl shadow-lg">
+                    <span class="text-[#ff6b8b] font-black text-sm md:text-lg block tracking-widest">
+                        🎁 当選した景品 🎁
+                    </span>
+                    <h2 id="overlayPrizeName" class="text-2xl md:text-4xl font-black text-slate-800 mt-1 tracking-wide truncate">
+                        --
+                    </h2>
+                </div>
+            </div>
+
+            <!-- 巨大な「お皿（レース調）風」当選ボード -->
+            <div class="relative w-80 h-80 md:w-[460px] md:h-[460px] rounded-full bg-[#ffb7c5] flex flex-col items-center justify-center shadow-[0_15px_40px_rgba(255,107,139,0.4)] border-8 border-white overflow-visible">
+                
+                <!-- お皿のフリル・レース調ドレープ装飾（外周に回る白い丸型の連なり） -->
+                <div class="absolute -inset-4 rounded-full border-4 border-dashed border-white pointer-events-none"></div>
+                <div class="absolute -inset-2 lace-border rounded-full pointer-events-none"></div>
+                
+                <!-- ボード内部コンテンツ -->
+                <div class="z-10 text-white flex flex-col items-center justify-center">
+                    <span class="text-lg md:text-2xl font-black tracking-[0.3em] text-[#ff6b8b] bg-white px-5 py-1.5 rounded-full shadow-sm mb-2 md:mb-4">
+                        当選番号
+                    </span>
+                    <!-- 巨大フォント：会場のどこからでも絶対にクッキリ見える太字 -->
+                    <span id="overlayWinnerNumber" class="text-7xl md:text-9xl font-black tracking-tight select-none leading-none my-1 text-slate-800 drop-shadow-md">
+                        999
+                    </span>
+                </div>
+            </div>
+
+            <!-- 閉じる用案内ボタン -->
+            <button onclick="closeRevealOverlay()" class="mt-8 px-10 py-4 bg-white hover:bg-pink-50 text-[#ff6b8b] border-4 border-[#ffb7c5] rounded-full text-lg font-black tracking-widest transition-all duration-300 shadow-xl flex items-center gap-3">
+                次の抽選へすすむ <i class="fa-solid fa-circle-arrow-right"></i>
+            </button>
+            <p class="text-xs text-white drop-shadow-sm mt-3 font-bold">※画面をクリック、またはSpace/Enterキーでも戻れます</p>
+
+        </div>
+    </div>
+
+    <!-- 設定モーダルダイアログ (初期状態は非表示) -->
+    <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+        <div class="bg-white border-4 border-[#ffb7c5] rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            
+            <!-- モーダルヘッダー -->
+            <div class="bg-gradient-to-r from-[#ff8da1] to-[#ffb7c5] p-5 flex justify-between items-center text-white">
+                <h3 class="text-xl font-black flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> 抽選の設定を調整する
+                </h3>
+                <button onclick="closeSettingsModal()" class="text-white hover:text-slate-100 transition text-2xl font-black">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- モーダルボディ -->
+            <div class="p-6 space-y-6 overflow-y-auto text-sm text-slate-700">
+                
+                <!-- 抽選方法の選択 -->
+                <div>
+                    <label class="block text-[#ff6b8b] font-black mb-2">① 抽選モードの選択</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" id="modeRangeBtn" onclick="switchMode('range')" class="p-3 rounded-2xl border-2 border-[#ff8da1] bg-[#ffb7c5]/20 font-black text-[#ff6b8b] transition text-center">
+                            連続した数値の範囲
+                        </button>
+                        <button type="button" id="modeCustomBtn" onclick="switchMode('custom')" class="p-3 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-400 hover:border-[#ff8da1] transition text-center">
+                            個別入力 (飛び値、名前など)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- パネルA: 範囲指定 -->
+                <div id="panelRange" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-slate-500 font-bold mb-1">開始（最小値）</label>
+                            <input type="number" id="inputMin" value="1" min="0" class="w-full p-3 bg-slate-50 rounded-2xl border-2 border-[#a5f3fc] text-slate-800 font-bold text-center focus:outline-none focus:ring-2 focus:ring-[#ff8da1]">
+                        </div>
+                        <div>
+                            <label class="block text-slate-500 font-bold mb-1">終了（最大値）</label>
+                            <input type="number" id="inputMax" value="100" min="1" class="w-full p-3 bg-slate-50 rounded-2xl border-2 border-[#a5f3fc] text-slate-800 font-bold text-center focus:outline-none focus:ring-2 focus:ring-[#ff8da1]">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- パネルB: カスタム入力 -->
+                <div id="panelCustom" class="space-y-2 hidden">
+                    <label class="block text-slate-500 font-bold mb-1">抽選対象のリスト（改行またはカンマで区切ってください）</label>
+                    <textarea id="inputCustomText" rows="4" placeholder="例: 101, 102, 105, 201&#10;※名前でも可: ゆうと, さくら, ひなた" class="w-full p-3 bg-slate-50 rounded-2xl border-2 border-[#a5f3fc] text-slate-800 font-bold placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ff8da1]"></textarea>
+                    <p class="text-xs text-sky-500 font-bold"><i class="fa-solid fa-circle-question"></i> 改行またはカンマ(,)で区切られた要素を1つずつ抽選します。</p>
+                </div>
+
+                <!-- 設定オプション -->
+                <div class="border-t-2 border-slate-100 pt-4 space-y-4">
+                    <label class="block text-[#ff6b8b] font-black mb-2">② オプション設定</label>
+                    
+                    <div class="flex items-center justify-between bg-pink-50/50 p-3 rounded-2xl border-2 border-pink-100">
+                        <div>
+                            <span class="block font-black text-slate-800">重複当選をしない (重複防止)</span>
+                            <span class="text-xs text-slate-500">同じ番号が二度と出ないように制御します</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="inputNoRepeat" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-[#ff8da1] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#ff6b8b]"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 景品リスト連動 -->
+                <div class="border-t-2 border-slate-100 pt-4 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-[#ff6b8b] font-black">③ 景品リストを連動させる (任意)</label>
+                        <span class="text-xs text-slate-400 font-bold">抽選順に景品名を表示</span>
+                    </div>
+                    <textarea id="inputPrizesText" rows="3" placeholder="1等: サーカス特賞ギフト&#10;2等: マルシェお楽しみ袋&#10;3等: かわいいアニマルぬいぐるみ" class="w-full p-3 bg-slate-50 rounded-2xl border-2 border-[#a5f3fc] text-slate-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ff8da1]"></textarea>
+                    <p class="text-xs text-slate-500 font-bold"><i class="fa-solid fa-circle-info"></i> 1行に1つの景品。1回目に引かれた人に1行目の景品が連動表示されます。</p>
+                </div>
+
+            </div>
+
+            <!-- モーダルフッター -->
+            <div class="p-4 bg-slate-50 border-t-2 border-slate-100 flex gap-3">
+                <button onclick="applySettings()" class="flex-1 py-3 bg-[#ff6b8b] text-white font-black text-base rounded-2xl hover:bg-[#ff8da1] transition shadow-md">
+                    設定を保存して新しくスタート！
+                </button>
+                <button onclick="closeSettingsModal()" class="px-5 py-3 bg-slate-200 text-slate-600 rounded-2xl hover:bg-slate-300 transition font-bold">
+                    戻る
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 音響および抽選ロジック用JS -->
+    <script>
+        // --- 状態管理オブジェクト ---
+        let state = {
+            mode: 'range', // 'range' または 'custom'
+            min: 1,
+            max: 100,
+            customList: [],
+            availablePool: [], // 抽選プール
+            prizes: [],       // 景品リスト
+            drawnHistory: [],  // 当選履歴: { number: String, prize: String, timestamp: String }
+            noRepeat: true,
+            isDrawing: false,
+            muted: false
+        };
+
+        // Web Audio APIのコンテキスト
+        let audioCtx = null;
+
+        // ページロード時の初期設定
+        window.onload = function() {
+            loadFromStorage();
+            initializePool();
+            updateUI();
+            setupKeyboardShortcut();
+        };
+
+        // --- 設定保存・読み込み ---
+        function saveToStorage() {
+            localStorage.setItem('garagara_lottery_state_pastel', JSON.stringify({
+                mode: state.mode,
+                min: state.min,
+                max: state.max,
+                customList: state.customList,
+                prizes: state.prizes,
+                noRepeat: state.noRepeat,
+                drawnHistory: state.drawnHistory
+            }));
+        }
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('garagara_lottery_state_pastel');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state.mode = parsed.mode || 'range';
+                    state.min = parseInt(parsed.min) || 1;
+                    state.max = parseInt(parsed.max) || 100;
+                    state.customList = parsed.customList || [];
+                    state.prizes = parsed.prizes || [];
+                    state.noRepeat = parsed.noRepeat !== undefined ? parsed.noRepeat : true;
+                    state.drawnHistory = parsed.drawnHistory || [];
+                } catch (e) {
+                    console.error("ストレージ復元失敗", e);
+                }
+            }
+        }
+
+        // --- 抽選プールの初期化 ---
+        function initializePool() {
+            if (state.mode === 'range') {
+                state.availablePool = [];
+                for (let i = state.min; i <= state.max; i++) {
+                    state.availablePool.push(String(i));
+                }
+            } else {
+                state.availablePool = [...state.customList];
+            }
+
+            // 重複排除設定かつ履歴がある場合、プールから既に引いたものを除く
+            if (state.noRepeat && state.drawnHistory.length > 0) {
+                const drawnNumbers = state.drawnHistory.map(h => h.number);
+                state.availablePool = state.availablePool.filter(val => !drawnNumbers.includes(val));
+            }
+        }
+
+        // --- UIの更新 ---
+        function updateUI() {
+            // ステータス表示
+            const rangeText = state.mode === 'range' 
+                ? `${state.min} 〜 ${state.max}` 
+                : `個別要素 (${state.customList.length}個)`;
+            document.getElementById('statusRange').innerText = rangeText;
+            document.getElementById('statusRemaining').innerText = state.availablePool.length;
+            
+            const total = state.mode === 'range' ? (state.max - state.min + 1) : state.customList.length;
+            document.getElementById('statusTotal').innerText = total;
+
+            const noRepeatEl = document.getElementById('statusNoRepeat');
+            if (state.noRepeat) {
+                noRepeatEl.innerText = "あり (重複防止)";
+                noRepeatEl.className = "text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700";
+            } else {
+                noRepeatEl.innerText = "なし (繰り返し可)";
+                noRepeatEl.className = "text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700";
+            }
+
+            // 景品の表示
+            const prizeCard = document.getElementById('prizeDisplayCard');
+            const prizeNameEl = document.getElementById('currentPrizeName');
+            const currentRound = state.drawnHistory.length;
+            
+            if (state.prizes.length > 0 && currentRound < state.prizes.length) {
+                prizeCard.classList.remove('hidden');
+                prizeNameEl.innerText = state.prizes[currentRound];
+            } else {
+                prizeCard.classList.add('hidden');
+            }
+
+            // 履歴リストの描画
+            renderHistory();
+        }
+
+        // --- 履歴の描画 ---
+        function renderHistory() {
+            const historyList = document.getElementById('historyList');
+            const emptyHistory = document.getElementById('emptyHistory');
+            const countEl = document.getElementById('historyCount');
+            
+            historyList.innerHTML = '';
+            countEl.innerText = state.drawnHistory.length;
+
+            if (state.drawnHistory.length === 0) {
+                emptyHistory.classList.remove('hidden');
+                historyList.classList.add('hidden');
+                return;
+            }
+
+            emptyHistory.classList.add('hidden');
+            historyList.classList.remove('hidden');
+
+            const reversedHistory = [...state.drawnHistory].reverse();
+
+            reversedHistory.forEach((item, index) => {
+                const originalIndex = state.drawnHistory.length - index;
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between p-3 bg-white/90 border-2 border-slate-100 rounded-2xl hover:border-[#ffb7c5] transition-all duration-300 shadow-sm";
+                
+                let prizeHtml = item.prize ? `<span class="text-xs bg-pink-100 text-[#ff6b8b] px-2.5 py-0.5 rounded-full ml-2 border border-pink-200 truncate max-w-[120px] inline-block align-middle font-black">${item.prize}</span>` : '';
+                
+                div.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <span class="w-6 h-6 rounded-full bg-pink-100 text-[#ff6b8b] text-xs flex items-center justify-center font-black font-mono shadow-inner">${originalIndex}</span>
+                        <div class="truncate">
+                            <span class="font-black text-slate-800 text-lg font-mono">${item.number}</span>
+                            ${prizeHtml}
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-bold font-mono">${item.timestamp}</span>
+                `;
+                historyList.appendChild(div);
+            });
+        }
+
+        // --- Web Audio API を用いたパステル＆ワクワクサウンドジェネレータ ---
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // ドラムロール音生成
+        function playDrumroll(duration) {
+            initAudio();
+            if (state.muted || !audioCtx) return;
+
+            const bufferSize = audioCtx.sampleRate * duration;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            const noiseSource = audioCtx.createBufferSource();
+            noiseSource.buffer = buffer;
+
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.value = 160;
+            filter.Q.value = 3.0;
+
+            const volumeGain = audioCtx.createGain();
+            const lfo = audioCtx.createOscillator();
+            const lfoGain = audioCtx.createGain();
+            
+            lfo.type = 'sine';
+            lfo.frequency.value = 18; // ドラムロールの刻み
+            lfoGain.gain.value = 0.55;
+
+            const staticGain = audioCtx.createGain();
+            staticGain.gain.value = 0.05;
+
+            staticGain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+            staticGain.gain.linearRampToValueAtTime(0.35, audioCtx.currentTime + duration - 0.2);
+            staticGain.gain.linearRampToValueAtTime(0.0, audioCtx.currentTime + duration);
+
+            lfo.connect(lfoGain);
+            lfoGain.connect(volumeGain.gain);
+            noiseSource.connect(filter);
+            filter.connect(volumeGain);
+            volumeGain.connect(staticGain);
+            staticGain.connect(audioCtx.destination);
+
+            lfo.start();
+            noiseSource.start();
+
+            setTimeout(() => {
+                try {
+                    lfo.stop();
+                    noiseSource.stop();
+                } catch(e){}
+            }, duration * 1000);
+        }
+
+        // マルシェに合う楽しげで華やかなファンファーレ
+        function playFanfare() {
+            initAudio();
+            if (state.muted || !audioCtx) return;
+
+            const now = audioCtx.currentTime;
+
+            // シンバルのような明るいノイズ
+            const cymbalBufferSize = audioCtx.sampleRate * 2.5;
+            const cymbalBuffer = audioCtx.createBuffer(1, cymbalBufferSize, audioCtx.sampleRate);
+            const cymbalData = cymbalBuffer.getChannelData(0);
+            for (let i = 0; i < cymbalBufferSize; i++) {
+                cymbalData[i] = Math.random() * 2 - 1;
+            }
+            const cymbalSource = audioCtx.createBufferSource();
+            cymbalSource.buffer = cymbalBuffer;
+
+            const highpass = audioCtx.createBiquadFilter();
+            highpass.type = 'highpass';
+            highpass.frequency.value = 6000;
+
+            const cymbalGain = audioCtx.createGain();
+            cymbalGain.gain.setValueAtTime(0.25, now);
+            cymbalGain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+
+            cymbalSource.connect(highpass);
+            highpass.connect(cymbalGain);
+            cymbalGain.connect(audioCtx.destination);
+            cymbalSource.start();
+
+            // ハッピーなブラス調和音 (Fメジャー/Cメジャー系の明るいコード)
+            const frequencies = [261.63, 329.63, 392.00, 523.25, 659.25]; // C major chord
+            
+            frequencies.forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const oscGain = audioCtx.createGain();
+                
+                osc.type = 'triangle'; // より柔らかく可愛いトーン
+                osc.frequency.value = freq;
+
+                // わずかにディレイをつけてキュートな広がり
+                oscGain.gain.setValueAtTime(0, now + idx * 0.02);
+                oscGain.gain.linearRampToValueAtTime(0.12, now + 0.05 + idx * 0.02);
+
+                const vibrato = audioCtx.createOscillator();
+                const vibratoGain = audioCtx.createGain();
+                vibrato.frequency.value = 6.0;
+                vibratoGain.gain.value = 2.0;
+                vibrato.connect(osc.frequency);
+                vibratoGain.connect(osc.frequency);
+                vibrato.start();
+
+                oscGain.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+
+                osc.connect(oscGain);
+                oscGain.connect(audioCtx.destination);
+                osc.start();
+
+                setTimeout(() => {
+                    try {
+                        osc.stop();
+                        vibrato.stop();
+                    } catch(e){}
+                }, 3000);
+            });
+        }
+
+        // --- 抽選システム実行 & ロジック ---
+        function startLottery() {
+            if (state.isDrawing) return;
+
+            // 既にオーバーレイ表示中は無視
+            if (!document.getElementById('revealOverlay').classList.contains('hidden')) {
+                return;
+            }
+
+            if (state.availablePool.length === 0) {
+                showToast("抽選できる番号が残っていません！設定を確認してください。", "warning");
+                return;
+            }
+
+            initAudio();
+
+            state.isDrawing = true;
+            document.getElementById('drawBtn').disabled = true;
+            document.getElementById('displayBanner').innerText = "ガラガラを回しています！ワクワク...";
+
+            const drum = document.getElementById('drumSvg');
+            const handle = document.getElementById('handleSvg');
+            
+            drum.classList.remove('animate-spin-garagara');
+            handle.classList.remove('animate-spin-handle');
+            void drum.offsetWidth; // 強制リフロー
+            drum.classList.add('animate-spin-garagara');
+            handle.classList.add('animate-spin-handle');
+
+            playDrumroll(3.0);
+
+            setTimeout(() => {
+                revealResult();
+            }, 3000);
+        }
+
+        // 当選発表の全画面モーダル表示
+        function revealResult() {
+            const randomIndex = Math.floor(Math.random() * state.availablePool.length);
+            const winner = state.availablePool[randomIndex];
+
+            if (state.noRepeat) {
+                state.availablePool.splice(randomIndex, 1);
+            }
+
+            const currentRound = state.drawnHistory.length;
+            const matchedPrize = (state.prizes.length > 0 && currentRound < state.prizes.length) 
+                ? state.prizes[currentRound] 
+                : "";
+
+            // 履歴に追加
+            const timestamp = getFormattedTime();
+            const historyItem = {
+                number: winner,
+                prize: matchedPrize,
+                timestamp: timestamp
+            };
+            state.drawnHistory.push(historyItem);
+            saveToStorage();
+
+            // ドラム回転初期化
+            const drum = document.getElementById('drumSvg');
+            drum.classList.remove('animate-spin-garagara');
+
+            // --- 投影用：全画面結果スクリーンの表示と更新 ---
+            const revealOverlay = document.getElementById('revealOverlay');
+            const overlayWinnerNumber = document.getElementById('overlayWinnerNumber');
+            const overlayPrizeContainer = document.getElementById('overlayPrizeContainer');
+            const overlayPrizeName = document.getElementById('overlayPrizeName');
+
+            // 巨大当選番号
+            overlayWinnerNumber.innerText = winner;
+
+            // 景品名の表示・非表示の連動
+            if (matchedPrize) {
+                overlayPrizeContainer.classList.remove('hidden');
+                overlayPrizeName.innerText = matchedPrize;
+            } else {
+                overlayPrizeContainer.classList.add('hidden');
+            }
+
+            // 全画面スクリーンを表示
+            revealOverlay.classList.remove('hidden');
+
+            // 音響と紙吹雪
+            playFanfare();
+            triggerConfetti();
+
+            // バナーメッセージ
+            document.getElementById('displayBanner').innerText = `前回の結果: ${winner} 番！ 次の準備ができました 🎈`;
+
+            // UI更新
+            updateUI();
+
+            state.isDrawing = false;
+            document.getElementById('drawBtn').disabled = false;
+        }
+
+        // 全画面結果スクリーンを閉じる
+        function closeRevealOverlay() {
+            const revealOverlay = document.getElementById('revealOverlay');
+            revealOverlay.classList.add('hidden');
+            confettiActive = false; // 紙吹雪を停止
+        }
+
+        // --- STREAMING_CHUNK: Launching the pastel confetti system... -->
+        // --- 画面一杯のポップなパステル紙吹雪システム ---
+        let confettiActive = false;
+        let confettiParticles = [];
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function triggerConfetti() {
+            resizeCanvas();
+            confettiActive = true;
+            confettiParticles = [];
+            
+            // ルリアンマルシェをイメージした可愛いパステルカラー群
+            const colors = ['#ff8da1', '#ffb7c5', '#fff176', '#a5f3fc', '#bbf7d0', '#fed7aa', '#ffffff'];
+            
+            // 全画面サイズに合わせた粒子作成 (広範囲)
+            for (let i = 0; i < 200; i++) {
+                confettiParticles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * -canvas.height - 20, // 画面上部から振らせる
+                    size: Math.random() * 10 + 6,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speedX: Math.random() * 6 - 3,
+                    speedY: Math.random() * 5 + 5,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 8 - 4,
+                    opacity: 1
+                });
+            }
+
+            requestAnimationFrame(updateConfetti);
+        }
+
+        function updateConfetti() {
+            if (!confettiActive) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            let alive = false;
+
+            confettiParticles.forEach(p => {
+                if (p.y < canvas.height && p.opacity > 0) {
+                    alive = true;
+                    p.x += p.speedX + Math.sin(p.y / 25) * 0.5; // ふんわりとしたゆらゆら効果
+                    p.y += p.speedY;
+                    p.rotation += p.rotationSpeed;
+                    
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rotation * Math.PI / 180);
+                    ctx.globalAlpha = p.opacity;
+                    ctx.fillStyle = p.color;
+                    
+                    // 正方形の紙吹雪や、星をイメージした円形をまぶす
+                    if (Math.random() > 0.4) {
+                        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    } else {
+                        ctx.beginPath();
+                        ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    
+                    ctx.restore();
+                }
+            });
+
+            if (alive) {
+                requestAnimationFrame(updateConfetti);
+            } else {
+                confettiActive = false;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            if (confettiActive) resizeCanvas();
+        });
+
+        // --- STREAMING_CHUNK: Controlling settings and storage with pastel theme... -->
+        // --- 設定モーダル関連の操作 ---
+        function openSettingsModal() {
+            if (state.isDrawing) return;
+            
+            document.getElementById('inputMin').value = state.min;
+            document.getElementById('inputMax').value = state.max;
+            document.getElementById('inputCustomText').value = state.customList.join(', ');
+            document.getElementById('inputNoRepeat').checked = state.noRepeat;
+            document.getElementById('inputPrizesText').value = state.prizes.join('\n');
+
+            switchMode(state.mode);
+
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        function switchMode(mode) {
+            state.mode = mode;
+            const rangeBtn = document.getElementById('modeRangeBtn');
+            const customBtn = document.getElementById('modeCustomBtn');
+            const panelRange = document.getElementById('panelRange');
+            const panelCustom = document.getElementById('panelCustom');
+
+            if (mode === 'range') {
+                rangeBtn.className = "p-3 rounded-2xl border-2 border-[#ff8da1] bg-[#ffb7c5]/20 font-black text-[#ff6b8b] transition text-center";
+                customBtn.className = "p-3 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-400 hover:border-[#ff8da1] transition text-center font-bold";
+                panelRange.classList.remove('hidden');
+                panelCustom.classList.add('hidden');
+            } else {
+                customBtn.className = "p-3 rounded-2xl border-2 border-[#ff8da1] bg-[#ffb7c5]/20 font-black text-[#ff6b8b] transition text-center";
+                rangeBtn.className = "p-3 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-400 hover:border-[#ff8da1] transition text-center font-bold";
+                panelRange.classList.add('hidden');
+                panelCustom.classList.remove('hidden');
+            }
+        }
+
+        function applySettings() {
+            const minVal = parseInt(document.getElementById('inputMin').value);
+            const maxVal = parseInt(document.getElementById('inputMax').value);
+
+            if (state.mode === 'range') {
+                if (isNaN(minVal) || isNaN(maxVal) || minVal > maxVal) {
+                    showToast("数値を正しく入力してください。", "error");
+                    return;
+                }
+                state.min = minVal;
+                state.max = maxVal;
+            } else {
+                const text = document.getElementById('inputCustomText').value;
+                state.customList = text.split(/[\n,]+/).map(s => s.trim()).filter(s => s.length > 0);
+                
+                if (state.customList.length === 0) {
+                    showToast("リストに要素を1つ以上入力してください。", "error");
+                    return;
+                }
+            }
+
+            state.noRepeat = document.getElementById('inputNoRepeat').checked;
+
+            const prizeText = document.getElementById('inputPrizesText').value;
+            state.prizes = prizeText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+
+            document.getElementById('displayBanner').innerText = "設定を保存しました！くじを引きましょう 🎈";
+
+            initializePool();
+            saveToStorage();
+            updateUI();
+            closeSettingsModal();
+            showToast("設定を保存しました！", "success");
+        }
+
+        // --- 各種ショートカット＆ユーティリティ ---
+        
+        function showToast(message, type = "success") {
+            const toast = document.createElement('div');
+            let colorClass = "from-emerald-500 to-green-400 text-white";
+            if (type === "error") colorClass = "from-rose-500 to-pink-400 text-white";
+            if (type === "warning") colorClass = "from-amber-400 to-orange-300 text-slate-800";
+
+            toast.className = `fixed bottom-4 right-4 bg-gradient-to-r ${colorClass} px-6 py-3.5 rounded-2xl shadow-xl z-50 transform translate-y-10 opacity-0 transition-all duration-300 flex items-center gap-2 border-2 border-white`;
+            toast.innerHTML = `<i class="fa-solid fa-star"></i> <span class="font-black">${message}</span>`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function getFormattedTime() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        function setupKeyboardShortcut() {
+            window.addEventListener('keydown', (e) => {
+                if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+                    return;
+                }
+                
+                // スペースキーまたはEnterキーの挙動
+                if (e.code === 'Space' || e.code === 'Enter') {
+                    e.preventDefault();
+                    
+                    const revealOverlay = document.getElementById('revealOverlay');
+                    // 当選スクリーン表示中なら閉じる
+                    if (!revealOverlay.classList.contains('hidden')) {
+                        closeRevealOverlay();
+                    } else {
+                        // 通常時は抽選開始
+                        startLottery();
+                    }
+                }
+            });
+
+            // 画面のどこをクリックしても当選スクリーンを閉じられるように設定
+            document.getElementById('revealOverlay').addEventListener('click', () => {
+                closeRevealOverlay();
+            });
+        }
+
+        function toggleMute() {
+            state.muted = !state.muted;
+            const icon = document.getElementById('muteIcon');
+            if (state.muted) {
+                icon.className = "fa-solid fa-volume-xmark text-red-500 animate-pulse";
+                showToast("音量をミュートにしました 🔇", "warning");
+            } else {
+                icon.className = "fa-solid fa-volume-high text-slate-700";
+                showToast("音量をオンにしました 🔊", "success");
+                initAudio();
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    showToast("全画面表示にできませんでした", "error");
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function clearHistoryConfirm() {
+            if (state.drawnHistory.length === 0) return;
+            
+            if (confirm("全ての当選履歴を削除しますか？\n（この操作は元に戻せません）")) {
+                state.drawnHistory = [];
+                saveToStorage();
+                initializePool();
+                updateUI();
+                showToast("履歴をすべて削除しました", "success");
+            }
+        }
+
+        function resetLotteryConfirm() {
+            if (confirm("抽選設定と履歴をすべてリセットし、初期状態に戻しますか？")) {
+                localStorage.removeItem('garagara_lottery_state_pastel');
+                state = {
+                    mode: 'range',
+                    min: 1,
+                    max: 100,
+                    customList: [],
+                    availablePool: [],
+                    prizes: [],
+                    drawnHistory: [],
+                    noRepeat: true,
+                    isDrawing: false,
+                    muted: state.muted
+                };
+                initializePool();
+                updateUI();
+                showToast("すべての設定を初期化しました 🎪", "success");
+            }
+        }
+
+        function exportCSV() {
+            if (state.drawnHistory.length === 0) {
+                showToast("エクスポートする履歴がありません", "warning");
+                return;
+            }
+
+            let csvContent = "\uFEFF"; 
+            csvContent += "抽選順,当選番号,連動景品,抽選時間\n";
+
+            state.drawnHistory.forEach((item, index) => {
+                const prize = item.prize ? item.prize.replace(/"/g, '""') : '';
+                csvContent += `${index + 1},"${item.number}","${prize}","${item.timestamp}"\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `marche_lottery_${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast("CSVファイルを出力しました！", "success");
+        }
+    </script>
+</body>
+</html>
